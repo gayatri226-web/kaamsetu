@@ -259,8 +259,8 @@ export function JobCard({ job, origin, onSelect, selected }) {
   )
 }
 
-/* Real street map: Leaflet + OpenStreetMap data (CARTO Voyager tiles). Falls back to SvgMap when offline. */
-const TILE = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+/* Real street map: Leaflet + OpenStreetMap data (standard OSM tiles, no API key). Falls back to SvgMap when offline. */
+const TILE = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 const pinIcon = (html, cls, size = 30) => Lf.divIcon({ html, className: `ks-pin ${cls}`, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
 
 export function MapView({ origin, originLabel, jobs = [], onSelect, selectedId, radiusKm = 2, pin, onPick, height = 280 }) {
@@ -274,7 +274,7 @@ export function MapView({ origin, originLabel, jobs = [], onSelect, selectedId, 
     if (failed || !el.current) return
     const m = Lf.map(el.current, { scrollWheelZoom: false, zoomControl: true, attributionControl: true }).setView([origin.lat, origin.lng], zoom)
     let ok = 0, bad = 0
-    Lf.tileLayer(TILE, { maxZoom: 19, subdomains: 'abcd', attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>' })
+    Lf.tileLayer(TILE, { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' })
       .on('tileload', () => { ok++ })
       .on('tileerror', () => { bad++; if (bad >= 4 && ok === 0) setFailed(true) })
       .addTo(m)
