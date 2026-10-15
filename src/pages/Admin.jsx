@@ -19,7 +19,7 @@ export default function Admin() {
     <div className="min-h-screen">
       <header className="bg-ink text-white">
         <div className="max-w-[1220px] mx-auto px-5 md:px-7 py-3 flex flex-wrap gap-3 items-center justify-between">
-          <div className="flex items-center gap-2.5 [&_a]:!text-white"><Logo /><span className="chip !bg-white/15 !text-white">Admin</span></div>
+          <div className="flex items-center gap-2.5"><Logo light /><span className="chip !bg-white/15 !text-white">Admin</span></div>
           <div className="flex gap-4 items-center text-[14px] font-semibold text-[#D8D2C6]"><span>Ghatkopar naka · mock data</span><Link to="/" className="!text-white underline">Home</Link></div>
         </div>
       </header>

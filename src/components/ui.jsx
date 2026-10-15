@@ -10,14 +10,26 @@ export function Icon({ name, size = 20, className = '', strokeWidth = 2, ...rest
   return <C size={size} strokeWidth={strokeWidth} className={className} aria-hidden="true" {...rest} />
 }
 
-export function Logo({ to = '/', size = 'md' }) {
-  const box = size === 'lg' ? 'w-10 h-10' : 'w-9 h-9'
+export function LogoMark({ size = 36 }) {
   return (
-    <Link to={to} className="flex items-center gap-2.5 no-underline text-ink">
-      <span className={`${box} bg-gold border-[1.5px] border-ink rounded-[10px] flex items-center justify-center`}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M2 17h20" /><path d="M4 17c2-6 14-6 16 0" /><path d="M8 17v-3.5" /><path d="M12 17v-4.5" /><path d="M16 17v-3.5" /></svg>
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
+      <rect x="1" y="1" width="38" height="38" rx="12" fill="#F2A93B" stroke="#1B1B1B" strokeWidth="1.5" />
+      <path d="M7 25.5 C 11 13, 29 13, 33 25.5" fill="none" stroke="#1B1B1B" strokeWidth="3" strokeLinecap="round" />
+      <path d="M5 25.5 H35" stroke="#1B1B1B" strokeWidth="3" strokeLinecap="round" />
+      <path d="M13.5 19.2 V25.5 M20 17 V25.5 M26.5 19.2 V25.5" stroke="#1B1B1B" strokeWidth="2" strokeLinecap="round" />
+      <path d="M10 25.5 V31 M30 25.5 V31" stroke="#1B1B1B" strokeWidth="3" strokeLinecap="round" />
+      <circle cx="20" cy="10.5" r="2.6" fill="#1F8A5B" stroke="#1B1B1B" strokeWidth="1.2" />
+    </svg>
+  )
+}
+
+export function Logo({ to = '/', size = 'md', light = false }) {
+  return (
+    <Link to={to} className="flex items-center gap-2.5 no-underline">
+      <LogoMark size={size === 'lg' ? 42 : 36} />
+      <span className={`font-display text-[22px] tracking-tight leading-none ${light ? 'text-white' : 'text-ink'}`}>
+        <span className="font-bold">Kaam</span><span className={`font-semibold ${light ? 'text-[#9FE3C4]' : 'text-greendark'}`}>Setu</span>
       </span>
-      <span className="font-display font-bold text-[21px] tracking-tight">KaamSetu</span>
     </Link>
   )
 }
@@ -59,6 +71,7 @@ export function Toast() {
 }
 
 const NAV = [
+  { to: '/w/home', key: 'nav_home', icon: 'LayoutDashboard' },
   { to: '/w', key: 'nav_work', icon: 'Briefcase', end: true },
   { to: '/w/parchi', key: 'nav_parchi', icon: 'FileText' },
   { to: '/w/card', key: 'nav_card', icon: 'IdCard' },
@@ -75,12 +88,13 @@ export function WorkerLayout({ children }) {
         <div className="px-2 pb-5"><Logo /></div>
         {NAV.map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end}
-            className={({ isActive }) => `min-h-[52px] flex items-center gap-3 px-3 rounded-xl border-[1.5px] no-underline text-[18px] ${isActive ? (n.ai ? 'bg-violetsoft' : 'bg-goldsoft') + ' border-ink shadow-[3px_3px_0_#1B1B1B] font-extrabold text-ink' : 'border-transparent font-semibold text-[#3A3732] hover:bg-sand'}`}>
+            className={({ isActive }) => `min-h-[50px] flex items-center gap-3 px-4 rounded-full border-[1.5px] no-underline text-[17px] ${isActive ? (n.ai ? 'bg-violetsoft' : 'bg-goldsoft') + ' border-ink shadow-[3px_3px_0_#1B1B1B] font-extrabold text-ink' : 'border-transparent font-semibold text-[#3A3732] hover:bg-sand'}`}>
             <Icon name={n.icon} size={22} className={n.ai ? 'text-violet' : ''} strokeWidth={1.9} />{t(n.key)}
           </NavLink>
         ))}
         <div className="mt-auto flex flex-col gap-2">
           <LangSwitch compact />
+          <Link to="/sms" className="flex items-center gap-2 px-4 min-h-[44px] rounded-full border-[1.5px] border-dashed border-ink text-[15px] font-bold no-underline text-ink"><Icon name="Smartphone" size={18} />{t('basicPhone')}</Link>
           <Link to="/e" className="px-3 py-2 text-[15px] font-bold text-muted">{t('employerLink')} →</Link>
           <button type="button" className="text-left px-3 text-[13px] font-semibold text-muted underline" onClick={() => { resetDemo(); showToast(t('resetDemo'), 'info'); navigate('/w') }}>{t('resetDemo')}</button>
         </div>
@@ -93,10 +107,10 @@ export function WorkerLayout({ children }) {
 
       <main className="flex-1 min-w-0 px-4 py-5 md:px-9 md:py-7 pb-28 md:pb-10">{children}</main>
 
-      <nav aria-label="main" className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t-[1.5px] border-ink grid grid-cols-5">
+      <nav aria-label="main" className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t-[1.5px] border-ink grid grid-cols-6 px-1 py-1.5 gap-0.5">
         {NAV.map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end}
-            className={({ isActive }) => `min-h-[64px] flex flex-col items-center justify-center gap-0.5 no-underline text-[12px] ${isActive ? 'font-extrabold text-ink bg-goldsoft' : 'font-semibold text-muted'}`}>
+            className={({ isActive }) => `min-h-[56px] flex flex-col items-center justify-center gap-0.5 no-underline text-[11px] rounded-full ${isActive ? 'font-extrabold text-ink bg-goldsoft' : 'font-semibold text-muted'}`}>
             <Icon name={n.icon} size={22} className={n.ai ? 'text-violet' : ''} />{t(n.key)}
           </NavLink>
         ))}
@@ -111,7 +125,7 @@ export function PageTitle({ title, sub, back }) {
   return (
     <div className="flex items-center gap-3.5 mb-5">
       {back && (
-        <Link to={back} aria-label={t('back')} className="btn btn-icon shrink-0"><Icon name="ArrowLeft" size={22} /></Link>
+        <Link to={back} aria-label={t('back')} className="btn btn-icon shrink-0 !rounded-full"><Icon name="ArrowLeft" size={22} /></Link>
       )}
       <div>
         <h1 className="m-0 text-[30px] md:text-[34px] font-extrabold leading-tight">{title}</h1>
@@ -286,10 +300,12 @@ export function EmployerHeader({ title = 'for Employers' }) {
       <div className="max-w-[1220px] mx-auto px-5 md:px-7 py-3 flex flex-wrap gap-3 items-center justify-between">
         <div className="flex items-center gap-2.5"><Logo /><span className="chip">{title}</span></div>
         <div className="flex flex-wrap gap-3 items-center">
-          <NavLink to="/e" end className={({ isActive }) => `font-bold text-[15px] ${isActive ? 'underline' : 'text-muted'}`}>Post a job</NavLink>
-          <NavLink to="/e/jobs" className={({ isActive }) => `font-bold text-[15px] ${isActive ? 'underline' : 'text-muted'}`}>My jobs</NavLink>
-          <Link to="/w" className="font-bold text-[15px] text-muted">Switch to worker</Link>
-          <span className="min-h-[42px] flex items-center gap-2 px-3 border-[1.5px] border-ink rounded-[10px] font-bold">Sharma ji
+          <nav className="flex gap-1 p-1 rounded-full border-[1.5px] border-ink bg-white">
+            <NavLink to="/e" end className={({ isActive }) => `px-4 min-h-[38px] flex items-center rounded-full font-bold text-[15px] no-underline ${isActive ? 'bg-ink text-white' : 'text-ink'}`}>Post a job</NavLink>
+            <NavLink to="/e/jobs" className={({ isActive }) => `px-4 min-h-[38px] flex items-center rounded-full font-bold text-[15px] no-underline ${isActive ? 'bg-ink text-white' : 'text-ink'}`}>My jobs</NavLink>
+          </nav>
+          <Link to="/w" className="px-4 min-h-[42px] flex items-center rounded-full font-bold text-[15px] text-muted no-underline hover:bg-sand">Switch to worker</Link>
+          <span className="min-h-[42px] flex items-center gap-2 pl-4 pr-2 border-[1.5px] border-ink rounded-full font-bold">Sharma ji
             <span className="chip !bg-mint !text-greendark !text-[13px]"><Icon name="Check" size={12} strokeWidth={3} />Verified</span></span>
         </div>
       </div>

@@ -21,6 +21,7 @@ Optional real AI answers in Setu Saathi: copy `.env.example` to `.env` and add a
 |---|---|
 | `#/` | Landing, role choice, language |
 | `#/onboard` | Tap-only onboarding: trade, years, naka (or location), photos, name → Setu number |
+| `#/w/home` | Worker dashboard: next job, earnings and dues, stats, week, alerts |
 | `#/w` | Worker feed: week (Hafta), "I'm at the naka" check-in, filters, scam flags, fair rate, nearby map, read-aloud |
 | `#/w/parchi` | Slips + dues summary (earned / received / due) |
 | `#/w/parchi/:id` | Kaam Parchi: confirm with stamp, daily work log, WhatsApp share, "Not paid" flow |
@@ -29,6 +30,7 @@ Optional real AI answers in Setu Saathi: copy `.env.example` to `.env` and add a
 | `#/w/saathi` | Setu Saathi: tap-chips, voice input, job safety check |
 | `#/e` | Employer: AI quick post, trade tiles, fair-rate check, location, find worker by Setu number, workers at naka |
 | `#/e/jobs` | Employer jobs: confirm attendance, mark paid, complete and rate (updates worker card) |
+| `#/sms` | Keypad-phone mode: missed call = check-in + job SMS, keys 1/2/0/3/9 (no smartphone or internet needed) |
 | `#/admin` | Admin: flagged listings, unpaid-wage reports, employer verification |
 
 "Reset demo" in the worker sidebar restores the sample data.

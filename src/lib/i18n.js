@@ -21,6 +21,8 @@ const S = {
   step3: { hi: 'अपने हक', mr: 'तुमचे हक्क', en: 'Your rights' },
   step3s: { hi: 'आपके लिए सरकारी योजनाएं और मदद।', mr: 'तुमच्यासाठी सरकारी योजना आणि मदत.', en: 'Schemes and help, matched to you.' },
 
+  nav_home: { hi: 'मेरा डैशबोर्ड', mr: 'माझा डॅशबोर्ड', en: 'My dashboard' },
+  basicPhone: { hi: 'कीपैड फ़ोन (SMS)', mr: 'कीपॅड फोन (SMS)', en: 'Keypad phone (SMS)' },
   nav_work: { hi: 'काम', mr: 'काम', en: 'Jobs' },
   nav_parchi: { hi: 'मेरी पर्ची', mr: 'माझी पावती', en: 'My slips' },
   nav_card: { hi: 'मेरा कार्ड', mr: 'माझे कार्ड', en: 'My card' },
@@ -85,7 +87,7 @@ const S = {
   worker: { hi: 'वर्कर', mr: 'कामगार', en: 'Worker' },
   saidYes: { hi: 'हाँ', mr: 'होय', en: 'Yes' },
   pendingYes: { hi: 'आपकी हाँ बाकी', mr: 'तुमचा होकार बाकी', en: 'Your yes pending' },
-  stampYes: { hi: 'पक्का', mr: 'पक्के', en: 'CONFIRMED' },
+  stampYes: { hi: 'पक्का', mr: 'पक्के', en: 'PAKKA' },
   empStamp: { hi: 'मालिक की हाँ', mr: 'मालकाचा होकार', en: 'employer yes' },
   bothStamp: { hi: 'दोनों की हाँ', mr: 'दोघांचा होकार', en: 'both said yes' },
   confirmYes: { hi: 'हाँ, पक्का करें', mr: 'होय, पक्के करा', en: 'Yes, confirm' },
