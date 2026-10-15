@@ -71,3 +71,17 @@ body {
 @keyframes rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
 .rise { animation: rise .25s ease both; }
 @media (prefers-reduced-motion: reduce) { .live-dot, .stamp-in, .rise { animation: none; } }
+
+/* ---------- Leaflet map ---------- */
+.ks-map { z-index: 0; background: #EEF1EA; font-family: 'Mukta', sans-serif; }
+.ks-map .leaflet-control-zoom a { border-radius: 8px; color: #1B1B1B; font-weight: 700; }
+.ks-map .leaflet-control-zoom { border: 1.5px solid #1B1B1B !important; border-radius: 10px; overflow: hidden; }
+.ks-map .leaflet-control-attribution { font-size: 10px; }
+.ks-pin { display: flex !important; align-items: center; justify-content: center; border-radius: 999px; background: #F2A93B; border: 1.5px solid #1B1B1B; font: 700 14px 'Space Grotesk', sans-serif; color: #1B1B1B; box-shadow: 0 2px 6px rgba(0,0,0,.25); cursor: pointer; transition: transform .15s; }
+.ks-pin:hover { transform: scale(1.12); }
+.ks-pin.ks-danger { background: #E5533D; color: #fff; }
+.ks-pin.ks-sel { border-width: 3px; font-size: 16px; }
+.ks-pin.ks-me { background: #1F8A5B; border: 3px solid #fff; box-shadow: 0 0 0 8px rgba(31,138,91,.22); cursor: default; }
+.ks-pin.ks-me:hover { transform: none; }
+.ks-pin.ks-job { background: #1B1B1B; color: #fff; border: 3px solid #F2A93B; font-size: 11px; letter-spacing: .5px; cursor: grab; }
+.ks-tip { font-family: 'Mukta', sans-serif; font-size: 13px; border: 1.5px solid #1B1B1B; border-radius: 8px; padding: 4px 8px; box-shadow: none; }

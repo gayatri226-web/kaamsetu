@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useStore } from '../lib/store'
-import { FAIR, NAKAS, TRADES, daysFrom, tradeById } from '../lib/data'
+import { FAIR, NAKAS, TRADES, dayISO, daysFrom, tradeById } from '../lib/data'
 import { checkJob, distanceKm, fmtDate, fmtDay, fmtRange, getLocation, parseQuickPost, rupee } from '../lib/logic'
-import { EmployerHeader, FairBar, Icon, Stars, Toast } from '../components/ui'
+import { EmployerHeader, FairBar, Icon, MapView, Stars, Toast } from '../components/ui'
 import { money } from './Parchi'
 
 const AREA_COORDS = {
@@ -12,20 +12,57 @@ const AREA_COORDS = {
   Kirol: { lat: 19.0882, lng: 72.9012 }, Chembur: { lat: 19.0622, lng: 72.9005 }, Powai: { lat: 19.1176, lng: 72.906 },
   Bhandup: { lat: 19.1435, lng: 72.937 }, Sion: { lat: 19.0434, lng: 72.8619 },
 }
-const startOptions = [[0, 'Today'], [1, 'Tomorrow'], [2, 'In 2 days'], [3, 'In 3 days']]
+const CAL = Array.from({ length: 14 }, (_, i) => dayISO(i))
+const consecutive = (from, n) => { const i = Math.max(0, CAL.indexOf(from)); return daysFrom(i, n) }
+
+function DayPicker({ days, onChange }) {
+  const set = new Set(days)
+  const toggle = (d) => { const nx = new Set(set); nx.has(d) ? nx.delete(d) : nx.add(d); onChange([...nx].sort()) }
+  const first = days[0] || dayISO(1)
+  const stepN = (dn) => onChange(consecutive(first, Math.max(1, Math.min(14 - CAL.indexOf(first), days.length + dn))))
+  return (
+    <div className="flex flex-col gap-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-[15px] font-bold">Which days? <span className="text-muted font-semibold">tap to pick, tap again to remove</span></span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-[14px] font-semibold text-muted mr-1">In a row from first day:</span>
+          <button type="button" aria-label="One day less" className="btn !min-h-[38px] !px-3" onClick={() => stepN(-1)}><Icon name="Minus" size={16} /></button>
+          <span className="num text-[22px] w-9 text-center">{days.length}</span>
+          <button type="button" aria-label="One day more" className="btn !min-h-[38px] !px-3" onClick={() => stepN(1)}><Icon name="Plus" size={16} /></button>
+        </div>
+      </div>
+      <div className="grid grid-cols-7 gap-1.5">
+        {CAL.map((d, i) => {
+          const on = set.has(d), sun = new Date(d + 'T12:00:00').getDay() === 0
+          return (
+            <button key={d} type="button" aria-pressed={on} onClick={() => toggle(d)}
+              className={`min-h-[64px] rounded-xl border-[1.5px] cursor-pointer flex flex-col items-center justify-center leading-tight ${on ? 'bg-ink text-white border-ink' : 'bg-white border-line hover:border-ink'}`}>
+              <span className={`text-[12px] font-bold uppercase ${on ? 'text-white/70' : sun ? 'text-coraldark' : 'text-muted'}`}>{i === 0 ? 'Today' : i === 1 ? 'Tmrw' : fmtDay(d, 'en')}</span>
+              <span className="num text-[22px]">{new Date(d + 'T12:00:00').getDate()}</span>
+              <span className={`text-[11px] font-semibold ${on ? 'text-white/70' : 'text-muted'}`}>{fmtDate(d, 'en').split(' ')[1]}</span>
+            </button>
+          )
+        })}
+      </div>
+      <div className={`text-[15px] font-semibold rounded-xl px-3.5 py-2.5 ${days.length ? 'bg-mint text-[#133F2C]' : 'bg-coralsoft text-coraldark'}`}>
+        {days.length ? <><b>{days.length} {days.length === 1 ? 'day' : 'days'}:</b> {days.map((d) => `${fmtDay(d, 'en')} ${fmtDate(d, 'en')}`).join(' · ')}</> : 'Pick at least one day'}
+      </div>
+    </div>
+  )
+}
 
 export function EmployerPost() {
   const { postJob, bookDirect, state, nakaWorkers, showToast } = useStore()
   const navigate = useNavigate()
   const [quick, setQuick] = useState('Need a painter for 3 days in Vidyavihar, 2BHK flat, 900 per day')
-  const [f, setF] = useState({ trade: 'painter', title: '', pay: '', hours: '9 – 6', start: 1, n: 1, address: '', area: 'Vidyavihar', lat: 19.0793, lng: 72.8962, advanceFee: 0 })
+  const [f, setF] = useState({ trade: 'painter', title: '', pay: '', hours: '9 – 6', days: daysFrom(1, 1), address: '', area: 'Vidyavihar', lat: 19.0793, lng: 72.8962, advanceFee: 0 })
   const [locBusy, setLocBusy] = useState(false)
   const [find, setFind] = useState('')
   const [filled, setFilled] = useState(false)
 
   const range = FAIR[f.trade]
   const pay = Number(f.pay) || 0
-  const preview = { ...f, pay, days: daysFrom(f.start, f.n), address: f.address, verified: true }
+  const preview = { ...f, pay, days: f.days, address: f.address, verified: true }
   const check = pay ? checkJob(preview) : null
   const kmFromNaka = distanceKm(NAKAS.ghatkopar, f)
   const allWorkers = [...nakaWorkers, ...(state.worker.checkedIn ? [] : [{ setu: state.worker.setu, name: state.worker.nameLatin, trade: state.worker.trade, years: state.worker.years, jobsDone: state.worker.jobsDone, rating: state.worker.rating, me: true }])]
@@ -36,12 +73,12 @@ export function EmployerPost() {
     setF((x) => ({
       ...x,
       trade: p.trade || x.trade,
-      n: p.days || x.n,
+      days: p.days ? consecutive(x.days[0] || dayISO(1), Math.min(p.days, 14)) : x.days,
       pay: p.pay ? String(p.pay) : x.pay,
       hours: p.hours || x.hours,
       area: p.area || x.area,
       ...(p.area && AREA_COORDS[p.area] ? AREA_COORDS[p.area] : {}),
-      title: `${tradeById(p.trade || x.trade).name.en} needed${p.days ? ` · ${p.days} days` : ''}${p.area ? ` · ${p.area}` : ''}`,
+      title: `${tradeById(p.trade || x.trade).name.en} needed${p.area ? ` · ${p.area}` : ''}`,
       address: x.address || (p.area ? `${p.area}, Mumbai` : ''),
     }))
     setFilled(true)
@@ -61,7 +98,7 @@ export function EmployerPost() {
     const tr = tradeById(f.trade)
     const title = f.title || `${tr.name.en} needed`
     return {
-      trade: f.trade, pay, hours: f.hours, days: daysFrom(f.start, f.n), advanceFee: Number(f.advanceFee) || 0,
+      trade: f.trade, pay, hours: f.hours, days: f.days, advanceFee: Number(f.advanceFee) || 0,
       title: { hi: title, mr: title, en: title },
       employer: { hi: 'शर्मा जी', mr: 'शर्मा जी', en: 'Sharma ji' },
       area: { hi: f.area, mr: f.area, en: f.area }, address: f.address, lat: f.lat, lng: f.lng,
@@ -70,13 +107,15 @@ export function EmployerPost() {
 
   const post = () => {
     if (!pay) return showToast('Enter pay per day', 'danger')
+    if (!f.days.length) return showToast('Pick which days', 'danger')
     postJob(draft())
-    showToast(check?.level === 'danger' ? 'Posted, but flagged for review' : 'Job posted to nearby workers')
+    const reach = allWorkers.filter((x) => x.trade === f.trade).length
+    showToast(check?.level === 'danger' ? 'Posted, but flagged for admin review' : `Posted. ${reach} ${tradeById(f.trade).name.en.toLowerCase()}${reach === 1 ? '' : 's'} nearby notified (app + SMS)`)
     navigate('/e/jobs')
   }
 
   const book = (w) => {
-    if (!pay) { showToast('Fill pay and dates first, then book', 'danger'); return }
+    if (!pay || !f.days.length) { showToast('Fill pay and days first, then book', 'danger'); return }
     bookDirect(w.setu, draft())
     showToast(`Pakka Booking sent to ${w.name}`)
     navigate('/e/jobs')
@@ -117,21 +156,13 @@ export function EmployerPost() {
 
             <div className="grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3.5">
               <label className="flex flex-col gap-1.5 text-[15px] font-bold">Pay per day (₹)
-                <input className="input num !text-[22px]" inputMode="numeric" placeholder="900" value={f.pay} onChange={(e) => setF({ ...f, pay: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
+                <input className="input num !text-[22px]" inputMode="numeric" placeholder={`${range[0]}–${range[1]}`} value={f.pay} onChange={(e) => setF({ ...f, pay: e.target.value.replace(/\D/g, '').slice(0, 5) })} />
               </label>
               <label className="flex flex-col gap-1.5 text-[15px] font-bold">Hours
                 <input className="input" value={f.hours} onChange={(e) => setF({ ...f, hours: e.target.value })} />
               </label>
-              <label className="flex flex-col gap-1.5 text-[15px] font-bold">Starts
-                <select className="input" value={f.start} onChange={(e) => setF({ ...f, start: +e.target.value })}>
-                  {startOptions.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                </select>
-              </label>
-              <label className="flex flex-col gap-1.5 text-[15px] font-bold">Number of days
-                <input className="input num !text-[20px]" type="number" min="1" max="60" value={f.n} onChange={(e) => setF({ ...f, n: Math.max(1, Math.min(60, +e.target.value || 1)) })} />
-              </label>
             </div>
-            <div className="text-[14px] font-semibold text-muted -mt-2">{fmtRange(daysFrom(f.start, f.n), 'en')}</div>
+            <DayPicker days={f.days} onChange={(days) => setF({ ...f, days })} />
 
             {pay > 0 && (
               <div className={`flex flex-col gap-2 p-3.5 rounded-xl ${check.fair === 'fair' ? 'bg-mint' : 'bg-coralsoft'}`}>
@@ -149,7 +180,8 @@ export function EmployerPost() {
                 <input id="addr" className="input flex-[1_1_280px]" placeholder="Flat / building, area" value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} />
                 <button type="button" className="btn !min-h-[52px]" onClick={useLoc} disabled={locBusy}><Icon name={locBusy ? 'LoaderCircle' : 'LocateFixed'} className={locBusy ? 'animate-spin' : ''} />Use my location</button>
               </div>
-              <div className="text-[14px] text-muted">{kmFromNaka.toFixed(1)} km from Ghatkopar naka · visible to workers within 3 km</div>
+              <div className="text-[14px] text-muted">{kmFromNaka.toFixed(1)} km from Ghatkopar naka · <b>tap the map or drag the JOB pin</b> to set the exact spot</div>
+              <MapView origin={{ lat: NAKAS.ghatkopar.lat, lng: NAKAS.ghatkopar.lng }} originLabel="Ghatkopar naka" radiusKm={3} jobs={[]} pin={{ lat: f.lat, lng: f.lng }} onPick={(ll) => setF((x) => ({ ...x, ...ll }))} height={240} />
             </div>
 
             <label className="flex items-center gap-3 text-[15px] font-semibold text-muted">
@@ -169,7 +201,7 @@ export function EmployerPost() {
             )}
 
             <div className="flex flex-wrap items-center justify-between gap-3.5 pt-1.5 border-t border-line">
-              <div><div className="text-[14px] font-semibold text-muted">Total</div><div className="num text-[30px]">{rupee(pay * f.n)}</div></div>
+              <div><div className="text-[14px] font-semibold text-muted">Total · reaches {allWorkers.filter((x) => x.trade === f.trade).length} {tradeById(f.trade).name.en.toLowerCase()}(s) nearby</div><div className="num text-[30px]">{pay ? rupee(pay * f.days.length) : '—'}</div>{pay > 0 && <div className="text-[13px] font-semibold text-muted">{rupee(pay)} × {f.days.length} {f.days.length === 1 ? 'day' : 'days'} · {fmtRange(f.days, 'en')}</div>}</div>
               <button type="button" className="btn btn-primary !min-h-[56px] text-[19px] px-7" onClick={post}>Post job</button>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { seedState, seedWorker, dayISO, OTHER_WORKERS, NAKAS } from './data'
 import { translate } from './i18n'
 import { checkJob } from './logic'
 
-const KEY = 'kaamsetu-demo-v3'
+const KEY = 'kaamsetu-demo-v4'
 const Ctx = createContext(null)
 
 function load() {
@@ -11,7 +11,7 @@ function load() {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const s = JSON.parse(raw)
-      if (s && s.v === 3) return s
+      if (s && s.v === 4) return s
     }
   } catch { /* storage may be blocked; fall back to seed */ }
   return seedState()

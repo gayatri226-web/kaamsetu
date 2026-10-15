@@ -151,7 +151,7 @@ export default function Onboarding() {
             <div className="bg-goldsoft rounded-2xl px-8 py-4"><div className="text-[14px] font-bold text-golddark">{t('setuNo')}</div><div className="num text-[64px] tracking-[14px] leading-none">{setu}</div></div>
             <div className="flex flex-wrap gap-3 justify-center">
               <ListenButton text={`${t('setuNo')}: ${setu.split('').join(' ')}`} label={t('hearNumber')} />
-              <button type="button" className="btn btn-primary text-[18px] min-h-[54px]" onClick={() => navigate('/w')}>{t('ob_go')}<Icon name="ArrowRight" /></button>
+              <button type="button" className="btn btn-primary text-[18px] min-h-[54px]" onClick={() => navigate('/w/home')}>{t('ob_go')}<Icon name="ArrowRight" /></button>
             </div>
           </div>
         )}

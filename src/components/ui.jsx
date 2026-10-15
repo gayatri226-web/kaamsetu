@@ -1,3 +1,6 @@
+import { useEffect, useRef, useState } from 'react'
+import Lf from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import { ICONS as Icons } from './icons'
 import { NavLink, Link, useNavigate } from 'react-router-dom'
 import { useStore, isOff } from '../lib/store'
@@ -231,7 +234,7 @@ export function JobCard({ job, origin, onSelect, selected }) {
         </div>
         <div className="text-[16px] text-muted">{L(job.employer, lang)} · {L(job.area, lang)}</div>
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold text-[#3A3732]">
-          <span className="flex items-center gap-1.5"><Icon name="CalendarDays" size={17} />{job.days.length} {t('days')} · {fmtRange(job.days, lang)}</span>
+          <span className="flex items-center gap-1.5"><Icon name="CalendarDays" size={17} />{job.days.length} {job.days.length === 1 ? t('day1') : t('days')} · {fmtRange(job.days, lang)}</span>
           <span className="flex items-center gap-1.5"><Icon name="Clock" size={17} />{job.hours}</span>
           {km != null && <span className="flex items-center gap-1.5"><Icon name="MapPin" size={17} />{km.toFixed(1)} km</span>}
         </div>
@@ -256,8 +259,65 @@ export function JobCard({ job, origin, onSelect, selected }) {
   )
 }
 
-/* Simple offline map: projects real lat/lng around the origin. Swap for Leaflet + OSM tiles in production. */
-export function MapView({ origin, jobs, onSelect, selectedId, radiusKm = 2 }) {
+/* Real street map: Leaflet + OpenStreetMap data (CARTO Voyager tiles). Falls back to SvgMap when offline. */
+const TILE = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+const pinIcon = (html, cls, size = 30) => Lf.divIcon({ html, className: `ks-pin ${cls}`, iconSize: [size, size], iconAnchor: [size / 2, size / 2] })
+
+export function MapView({ origin, originLabel, jobs = [], onSelect, selectedId, radiusKm = 2, pin, onPick, height = 280 }) {
+  const { t, lang } = useStore()
+  const el = useRef(null), map = useRef(null), layer = useRef(null), cb = useRef({})
+  const [failed, setFailed] = useState(false)
+  cb.current = { onSelect, onPick }
+  const zoom = radiusKm <= 2 ? 14 : 13
+
+  useEffect(() => {
+    if (failed || !el.current) return
+    const m = Lf.map(el.current, { scrollWheelZoom: false, zoomControl: true, attributionControl: true }).setView([origin.lat, origin.lng], zoom)
+    let ok = 0, bad = 0
+    Lf.tileLayer(TILE, { maxZoom: 19, subdomains: 'abcd', attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>' })
+      .on('tileload', () => { ok++ })
+      .on('tileerror', () => { bad++; if (bad >= 4 && ok === 0) setFailed(true) })
+      .addTo(m)
+    m.on('click', (e) => cb.current.onPick?.({ lat: +e.latlng.lat.toFixed(5), lng: +e.latlng.lng.toFixed(5) }))
+    layer.current = Lf.layerGroup().addTo(m)
+    map.current = m
+    const ro = new ResizeObserver(() => m.invalidateSize())
+    ro.observe(el.current)
+    return () => { ro.disconnect(); m.remove(); map.current = null }
+  }, [failed]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => { map.current?.flyTo([origin.lat, origin.lng], zoom, { duration: 0.6 }) }, [origin.lat, origin.lng, zoom])
+
+  useEffect(() => {
+    const g = layer.current
+    if (!g) return
+    g.clearLayers()
+    Lf.circle([origin.lat, origin.lng], { radius: radiusKm * 1000, color: '#1F8A5B', weight: 1.5, dashArray: '6 6', fillColor: '#1F8A5B', fillOpacity: 0.06, interactive: false }).addTo(g)
+    Lf.marker([origin.lat, origin.lng], { icon: pinIcon('<i></i>', 'ks-me', 22), keyboard: false, interactive: false }).addTo(g)
+      .bindTooltip(originLabel || t('you'), { permanent: true, direction: 'bottom', offset: [0, 10], className: 'ks-tip' })
+    jobs.forEach((j, i) => {
+      const danger = checkJob(j).level === 'danger', sel = selectedId === j.id
+      Lf.marker([j.lat, j.lng], { icon: pinIcon(danger ? '!' : String(i + 1), `${danger ? 'ks-danger' : ''} ${sel ? 'ks-sel' : ''}`, sel ? 36 : 30), zIndexOffset: sel ? 500 : 0, title: L(j.title, lang) })
+        .on('click', () => cb.current.onSelect?.(j.id))
+        .bindTooltip(`<b>${L(j.title, lang)}</b><br>${rupee(j.pay)} · ${distanceKm(origin, j).toFixed(1)} km`, { direction: 'top', offset: [0, -14], className: 'ks-tip' })
+        .addTo(g)
+    })
+    if (pin) Lf.marker([pin.lat, pin.lng], { icon: pinIcon('<span>JOB</span>', 'ks-job', 40), draggable: !!onPick })
+      .on('dragend', (e) => { const ll = e.target.getLatLng(); cb.current.onPick?.({ lat: +ll.lat.toFixed(5), lng: +ll.lng.toFixed(5) }) })
+      .addTo(g)
+  }, [jobs, selectedId, origin.lat, origin.lng, radiusKm, pin?.lat, pin?.lng, lang, failed]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const j = jobs.find((x) => x.id === selectedId)
+    if (j && map.current) map.current.panTo([j.lat, j.lng], { animate: true })
+  }, [selectedId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (failed) return <SvgMap origin={origin} jobs={jobs} onSelect={onSelect} selectedId={selectedId} radiusKm={radiusKm} />
+  return <div ref={el} role="application" aria-label={`${t('nearby')}: ${jobs.length}`} className="ks-map w-full rounded-[10px] border-[1.5px] border-line overflow-hidden" style={{ height }} />
+}
+
+/* Offline fallback map, used only if map tiles can't load. */
+function SvgMap({ origin, jobs, onSelect, selectedId, radiusKm = 2 }) {
   const { t } = useStore()
   const W = 340, H = 250, cx = W / 2, cy = H / 2, pxPerKm = 92 / radiusKm
   const proj = (p) => ({

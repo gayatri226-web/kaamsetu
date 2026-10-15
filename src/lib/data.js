@@ -56,7 +56,7 @@ export function seedJobs() {
       pay: 750, days: daysFrom(0, 1), hours: '10 – 5', rating: 4.5,
     }),
     job({
-      id: 'j3', trade: 'helper', title: { hi: 'मज़दूर चाहिए, तुरंत', mr: 'मजूर हवा, लगेच', en: 'Labour needed urgently' },
+      id: 'j3', trade: 'painter', title: { hi: 'पेंटर चाहिए, तुरंत', mr: 'पेंटर हवा, लगेच', en: 'Painter needed urgently' },
       employer: { hi: 'अनजान', mr: 'अज्ञात', en: 'Unknown' }, employerId: 'unknown',
       area: { hi: 'पता नहीं दिया', mr: 'पत्ता नाही', en: 'Not given' },
       address: '', lat: 19.0935, lng: 72.9195, pay: 2500, advanceFee: 500, verified: false, rating: 0,
@@ -91,6 +91,62 @@ export function seedJobs() {
       address: 'Asalpha village road', lat: 19.0955, lng: 72.8985, pay: 300, verified: false, rating: 3.1,
       days: daysFrom(1, 2), hours: '8 – 7',
     }),
+    job({
+      id: 'j8', trade: 'electrician', title: { hi: 'पंखा और लाइट फिटिंग', mr: 'पंखा आणि लाइट फिटिंग', en: 'Fan and light fitting' },
+      employer: { hi: 'देसाई परिवार', mr: 'देसाई कुटुंब', en: 'Desai family' }, employerId: 'desai',
+      area: { hi: 'घाटकोपर पश्चिम', mr: 'घाटकोपर पश्चिम', en: 'Ghatkopar West' },
+      address: 'Flat 7, Shanti Niwas, Ghatkopar West', lat: 19.0872, lng: 72.9031,
+      pay: 950, days: daysFrom(0, 1), hours: '10 – 4', rating: 4.6,
+    }),
+    job({
+      id: 'j9', trade: 'electrician', title: { hi: 'दुकान की वायरिंग', mr: 'दुकानाची वायरिंग', en: 'Shop rewiring' },
+      employer: { hi: 'गणेश हार्डवेयर', mr: 'गणेश हार्डवेअर', en: 'Ganesh Hardware' }, employerId: 'ganesh',
+      area: { hi: 'पंत नगर', mr: 'पंत नगर', en: 'Pant Nagar' },
+      address: 'Shop 12, Pant Nagar market', lat: 19.0812, lng: 72.9165,
+      pay: 1000, days: daysFrom(1, 2), hours: '9 – 6', rating: 4.5,
+    }),
+    job({
+      id: 'j10', trade: 'electrician', title: { hi: 'सोलर पैनल लगाना, तुरंत', mr: 'सोलर पॅनल बसवणे, लगेच', en: 'Solar panel install, urgent' },
+      employer: { hi: 'अनजान', mr: 'अज्ञात', en: 'Unknown' }, employerId: 'unknown2',
+      area: { hi: 'पता नहीं दिया', mr: 'पत्ता नाही', en: 'Not given' },
+      address: '', lat: 19.0925, lng: 72.9175, pay: 3000, advanceFee: 800, verified: false, rating: 0,
+      days: daysFrom(0, 1), hours: '8 – 8', payWhen: { hi: 'काम के बाद', mr: 'कामानंतर', en: 'After work' },
+    }),
+    job({
+      id: 'j11', trade: 'plumber', title: { hi: 'बाथरूम पाइप लीकेज', mr: 'बाथरूम पाइप गळती', en: 'Bathroom pipe leak' },
+      employer: { hi: 'कुलकर्णी जी', mr: 'कुलकर्णी', en: 'Mr. Kulkarni' }, employerId: 'kulkarni',
+      area: { hi: 'विद्याविहार पूर्व', mr: 'विद्याविहार पूर्व', en: 'Vidyavihar East' },
+      address: 'B-9, Rajawadi Road, Vidyavihar East', lat: 19.0806, lng: 72.9021,
+      pay: 900, days: daysFrom(0, 1), hours: '11 – 3', rating: 4.7,
+    }),
+    job({
+      id: 'j12', trade: 'plumber', title: { hi: 'नई सोसाइटी में पाइपलाइन', mr: 'नवीन सोसायटीत पाइपलाइन', en: 'Pipeline for new society wing' },
+      employer: { hi: 'श्री बिल्डर्स', mr: 'श्री बिल्डर्स', en: 'Shree Builders' }, employerId: 'shree',
+      area: { hi: 'विक्रोली', mr: 'विक्रोळी', en: 'Vikhroli' },
+      address: 'Shree Heights site, LBS Marg, Vikhroli', lat: 19.1060, lng: 72.9245,
+      pay: 950, days: daysFrom(2, 5), hours: '8 – 5', rating: 4.4,
+    }),
+    job({
+      id: 'j13', trade: 'carpenter', title: { hi: 'किचन कैबिनेट मरम्मत', mr: 'किचन कॅबिनेट दुरुस्ती', en: 'Kitchen cabinet repair' },
+      employer: { hi: 'जोशी परिवार', mr: 'जोशी कुटुंब', en: 'Joshi family' }, employerId: 'joshi',
+      area: { hi: 'राजावाड़ी', mr: 'राजावाडी', en: 'Rajawadi' },
+      address: 'Flat 302, Gokul CHS, Rajawadi', lat: 19.0791, lng: 72.9101,
+      pay: 950, days: daysFrom(2, 2), hours: '10 – 6', rating: 4.8,
+    }),
+    job({
+      id: 'j14', trade: 'mason', title: { hi: 'फ़र्श पर टाइल लगाना', mr: 'फरशीवर टाइल बसवणे', en: 'Floor tiling' },
+      employer: { hi: 'साईं बिल्डर्स', mr: 'साई बिल्डर्स', en: 'Sai Builders' }, employerId: 'sai',
+      area: { hi: 'असल्फा', mr: 'असल्फा', en: 'Asalpha' },
+      address: 'Sai Residency site, Asalpha', lat: 19.0948, lng: 72.8992,
+      pay: 850, days: daysFrom(3, 4), hours: '8 – 5', rating: 4.3,
+    }),
+    job({
+      id: 'j15', trade: 'cleaning', title: { hi: 'ऑफिस की गहरी सफ़ाई', mr: 'ऑफिसची सखोल स्वच्छता', en: 'Office deep cleaning' },
+      employer: { hi: 'स्टार ट्यूशन', mr: 'स्टार ट्यूशन', en: 'Star Tuition' }, employerId: 'star',
+      area: { hi: 'घाटकोपर पूर्व', mr: 'घाटकोपर पूर्व', en: 'Ghatkopar East' },
+      address: '2nd floor, Star Tuition, Ghatkopar East', lat: 19.0832, lng: 72.9118,
+      pay: 600, days: daysFrom(0, 1), hours: '7 – 11', rating: 4.5,
+    }),
   ]
 }
 
@@ -114,6 +170,8 @@ export const OTHER_WORKERS = [
   { setu: '3851', name: 'Suresh Patil', trade: 'painter', years: '6–10', jobsDone: 15, rating: 4.6, atNaka: true },
   { setu: '5120', name: 'Arif Y.', trade: 'painter', years: '10+', jobsDone: 31, rating: 4.9, atNaka: true },
   { setu: '7703', name: 'Mohan S.', trade: 'helper', years: '3–5', jobsDone: 9, rating: 4.2, atNaka: true },
+  { setu: '6408', name: 'Imran K.', trade: 'electrician', years: '6–10', jobsDone: 22, rating: 4.7, atNaka: true },
+  { setu: '4196', name: 'Prakash M.', trade: 'plumber', years: '10+', jobsDone: 40, rating: 4.8, atNaka: true },
 ]
 
 export function seedBookings() {
@@ -141,7 +199,7 @@ export function seedComplaints() {
 
 export function seedState() {
   return {
-    v: 3,
+    v: 4,
     lang: 'hi',
     worker: seedWorker(),
     jobs: seedJobs(),

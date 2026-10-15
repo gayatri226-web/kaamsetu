@@ -9,6 +9,7 @@ export default function Feed() {
   const { t, lang, state, today, bookedDays, toggleCheckIn, showToast, naka } = useStore()
   const w = state.worker
   const [filter, setFilter] = useState('all')
+  const [scope, setScope] = useState('mine')
   const [origin, setOrigin] = useState({ lat: naka.lat, lng: naka.lng, src: naka.id })
   const [locBusy, setLocBusy] = useState(false)
   const [selected, setSelected] = useState(null)
@@ -19,6 +20,7 @@ export default function Feed() {
       .filter((j) => j.status === 'open')
       .filter((j) => !j.directFor || j.directFor === w.setu)
       .filter((j) => !j.days.some((d) => bookedSet.has(d)))
+      .filter((j) => scope === 'all' || j.trade === w.trade)
       .filter((j) => filter === 'all' || jobType(j, today) === filter)
       .map((j) => ({ j, km: distanceKm(origin, j), c: checkJob(j) }))
       .sort((a, b) => {
@@ -26,7 +28,7 @@ export default function Feed() {
         const match = (x) => (x.j.trade === w.trade ? 0 : 1)
         return lv(a) - lv(b) || match(a) - match(b) || a.km - b.km
       })
-  }, [state.jobs, bookedDays, filter, origin, today, w.trade, w.setu])
+  }, [state.jobs, bookedDays, filter, scope, origin, today, w.trade, w.setu])
 
   const useMyLocation = async () => {
     setLocBusy(true)
@@ -85,13 +87,30 @@ export default function Feed() {
 
       <div className="flex flex-wrap gap-6 items-start">
         <section className="flex-[999_1_480px] min-w-0 flex flex-col gap-3.5">
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="seg" role="group" aria-label="Trade">
+              <button type="button" aria-pressed={scope === 'mine'} onClick={() => setScope('mine')} className="flex items-center gap-1.5">
+                <Icon name={tradeById(w.trade).icon} size={17} />{t('myTrade', { trade: L(tradeById(w.trade).name, lang) })}
+              </button>
+              <button type="button" aria-pressed={scope === 'all'} onClick={() => setScope('all')}>{t('allTrades')}</button>
+            </div>
             <div className="seg overflow-x-auto max-w-full" role="group" aria-label="Filter">
               {filters.map(([k, key]) => <button key={k} type="button" aria-pressed={filter === k} onClick={() => setFilter(k)}>{t(key)}</button>)}
             </div>
-            <span className="text-[15px] font-semibold text-muted">{t('jobsForYou', { n: visible.filter((v) => v.c.level !== 'danger').length })}</span>
+            <span className="ml-auto text-[15px] font-semibold text-muted">{t('jobsForYou', { n: visible.filter((v) => v.c.level !== 'danger').length })}</span>
           </div>
-          {visible.length === 0 && <div className="card p-6 text-[17px] font-semibold text-muted">{t('noJobs')}</div>}
+          {visible.length === 0 && (
+            <div className="card p-6 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className="w-12 h-12 rounded-full bg-sand flex items-center justify-center"><Icon name="Briefcase" size={22} /></span>
+                <div><div className="text-[18px] font-extrabold">{t('noJobs')}</div><div className="text-[15px] text-muted">{t('noJobsHint')}</div></div>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {filter !== 'all' && <button type="button" className="btn" onClick={() => setFilter('all')}>{t('f_all')}</button>}
+                {scope === 'mine' && <button type="button" className="btn btn-primary" onClick={() => setScope('all')}>{t('allTrades')}</button>}
+              </div>
+            </div>
+          )}
           {visible.map(({ j }) => <JobCard key={j.id} job={j} origin={origin} onSelect={setSelected} selected={selected === j.id} />)}
         </section>
 
@@ -101,7 +120,7 @@ export default function Feed() {
               <span className="text-[18px] font-extrabold">{t('nearby')}</span>
               <span className="text-[14px] font-semibold text-muted">{origin.src === 'me' ? t('you') : L(NAKAS[origin.src]?.name, lang)} · {t('within', { km: 2 })}</span>
             </div>
-            <MapView origin={origin} jobs={visible.map((v) => v.j)} onSelect={select} selectedId={selected} />
+            <MapView origin={origin} originLabel={origin.src === 'me' ? t('you') : L(NAKAS[origin.src]?.name, lang)} jobs={visible.map((v) => v.j)} onSelect={select} selectedId={selected} height={270} />
             <button type="button" className="btn" onClick={useMyLocation} disabled={locBusy}>
               <Icon name={locBusy ? 'LoaderCircle' : 'LocateFixed'} className={locBusy ? 'animate-spin' : ''} />{locBusy ? t('locating') : t('useLocation')}
             </button>

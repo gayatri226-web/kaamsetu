@@ -25,9 +25,9 @@ export default function BasicPhone() {
   const offers = useMemo(() => {
     const booked = new Set(Object.keys(bookedDays))
     return state.jobs
-      .filter((j) => j.status === 'open' && (!j.directFor || j.directFor === w.setu))
+      .filter((j) => j.status === 'open' && j.trade === w.trade && (!j.directFor || j.directFor === w.setu))
       .filter((j) => checkJob(j).level === 'ok' && !j.days.some((d) => booked.has(d)))
-      .sort((a, b) => (a.trade === w.trade ? 0 : 1) - (b.trade === w.trade ? 0 : 1) || a.days[0].localeCompare(b.days[0]))
+      .sort((a, b) => a.days[0].localeCompare(b.days[0]))
   }, [state.jobs, bookedDays, w.trade, w.setu])
 
   useEffect(() => { screenRef.current?.scrollTo({ top: 99999, behavior: 'smooth' }) }, [msgs])
@@ -46,7 +46,7 @@ export default function BasicPhone() {
 
   const sendOffer = (i) => {
     const j = offers[i]
-    if (!j) { push(tr('अभी और काम नहीं है। नया काम आते ही SMS आएगा।', 'आत्ता आणखी काम नाही. नवीन काम आल्यावर SMS येईल.', 'No more jobs right now. We will SMS you when one comes.')); setMode('idle'); return }
+    if (!j) { push(tr(`अभी ${L(tradeById(w.trade).name, 'hi')} का और काम नहीं है। नया काम आते ही SMS आएगा।`, `आत्ता ${L(tradeById(w.trade).name, 'mr')} चे आणखी काम नाही. नवीन काम आल्यावर SMS येईल.`, `No more ${L(tradeById(w.trade).name, 'en')} jobs right now. We will SMS you when one comes.`)); setMode('idle'); return }
     setOfferIdx(i); setMode('offer'); push(offerText(j))
   }
 
@@ -200,7 +200,8 @@ export default function BasicPhone() {
               ))}
             </div>
           </div>
-          <div className="text-center text-[14px] text-muted mt-4">
+          <div className="text-center text-[14px] font-semibold mt-3">{w.name} · {L(tradeById(w.trade).name, lang)} · {tr('सेतु', 'सेतू', 'Setu')} {w.setu}</div>
+          <div className="text-center text-[14px] text-muted mt-1">
             {mode === 'booked' && lastBooking
               ? <Link to="/e/jobs" className="font-bold underline">{tr('मालिक की तरफ़ देखें: My jobs →', 'मालकाच्या बाजूने पाहा: My jobs →', "See it on the employer side: My jobs →")}</Link>
               : tr('बटन दबाकर देखें', 'बटणे दाबून पाहा', 'Try the keys')}
